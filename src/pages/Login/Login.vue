@@ -9,7 +9,8 @@
         </div>
       </div>
       <div class="login_content">
-        <form @submit.prevent="login">  //阻止表单自动提交
+        <form @submit.prevent="login">
+<!--          阻止表单自动提交-->
           <div :class="{on:loginWay}">
             <section class="login_message">
               <input type="tel" maxlength="11" placeholder="手机号" v-model="phone">
@@ -52,10 +53,13 @@
         <i class="iconfont icon-icon-jiantou2"></i>
       </a>
     </div>
+    <AlertTip :alertText="alertText" v-show="alertShow" @closeTip="closeTip"/>
   </section>
+
 </template>
 
 <script type="text/ecmascript-6">
+  import AlertTip from '../../components/AlertTip/AlertTip'
   export default {
     data(){
       return{
@@ -67,6 +71,8 @@
         code:'',//短信验证码
         name:'',//用户名
         captcha:'',//图形验证码
+        alertText: '',//提示文本
+        alertShow:false,//是否显示提示框
       }
     },
     computed:{
@@ -92,6 +98,10 @@
         }
 
       },
+      showAlert(alertText){
+        this.alertText=alertText
+        this.alertShow=true
+      },
       //异步登录
       login(){
         //前台表单验证
@@ -99,20 +109,32 @@
           const {rightPhone,phone,code}=this
           if(!this.rightPhone){
             //手机号不对
+            this.showAlert('手机号不正确')
           }else if(!/^\d{6}$/.test(code)){
             //验证码为6位
+            this.showAlert('验证码为6位')
           }
         }else {
           const {name,pwd,captcha}=this
           if(!this.name){
             //用户名需要指定
+            this.showAlert('用户名需要指定')
           }else if(!this.pwd){
             //密码需要指定
+            this.showAlert('密码需要指定')
           }else if(!this.captcha){
             //验证码需要指定
+            this.showAlert('验证码需要指定')
           }
         }
+      },
+      closeTip(){
+        this.alertText=''
+        this.alertShow=false
       }
+    },
+    components :{
+      AlertTip
     }
   }
 </script>
