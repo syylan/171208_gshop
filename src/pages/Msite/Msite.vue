@@ -2,21 +2,23 @@
   <section class="msite">
     <!--首页头部-->
      <HeaderTop :title="address.name">
-       <span class="header_search" slot="left">
+       <router-link class="header_search" slot="left" to="/search">
             <i class="iconfont icon-icon-sousuo"></i>
-       </span>
-      <span class="header_login" slot="right">
-        <span class="header_login_text">登录|注册</span>
-      </span>
+       </router-link>
+      <router-link class="header_login" slot="right" :to="userInfo._id?'/userinfo':'/login'">
+        <span class="header_login_text" v-if="!userInfo._id">登录|注册</span>
+        <span class="header_login_text" v-else>
+           <i class="iconfont icon-icon-person"></i>
+        </span>
+
+      </router-link>
     </HeaderTop>
     <!--首页导航-->
     <nav class="msite_nav">
       <div class="swiper-container">
         <div class="swiper-wrapper">
-          <div class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="
-index">
-            <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="
-index">
+          <div class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="index">
+            <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="index">
               <div class="food_container">
                 <img :src="baseImageUrl+category.image_url">
               </div>
@@ -59,7 +61,7 @@ index">
 
     },
     computed:{
-      ...mapState(['address','categorys']), //读数据
+      ...mapState(['address','categorys','userInfo']), //读数据
       // 根据categorys一维数组生成二维数组
       categorysArr(){
         const {categorys}=this

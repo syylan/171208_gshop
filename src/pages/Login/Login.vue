@@ -41,7 +41,8 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha"
+                @click="getCaptcha" ref="captcha">
               </section>
             </section>
           </div>
@@ -60,6 +61,7 @@
 
 <script type="text/ecmascript-6">
   import AlertTip from '../../components/AlertTip/AlertTip'
+  import {reqSendCode,reqSmsLogin,reqPwdLogin} from '../../api'
   export default {
     data(){
       return{
@@ -82,19 +84,28 @@
     },
     methods:{
       //异步获取短信验证码
-      getCode(){
+      async getCode(){
         //启动倒计时
         if (!this.computeTime){
           this.computeTime=30
-          const intervalId= setInterval(()=>{
+          this.intervalId= setInterval(()=>{
             this.computeTime--
-            if (computeTime<=0){
+            if (this.computeTime<=0){
               //停止计时
-              clearInterval(intervalId)
+              clearInterval(this.intervalId)  //定时器句柄
             }
           },1000)
-          // alert("asasas")
           //发送ajax请求
+          const result=await reqSendCode(this.phone)
+          if(result.code===1){
+            //显示提示
+            this.showAlert(result.msg)
+            //停止倒计数
+            if (this.computeTime){
+              this.computeTime=0
+              clearInterval(this.intervalId)
+            }
+          }
         }
 
       },
@@ -102,36 +113,71 @@
         this.alertText=alertText
         this.alertShow=true
       },
+      //获取不同的验证码图片
+      getCaptcha(){
+        this.$refs.captcha.src='http://localhost:4000/captcha?time='+Date.now() //Date.now()为了解决get请求缓存问题
+      },
       //异步登录
-      login(){
+      async login(){
+        let result
         //前台表单验证
         if (this.loginWay){//短信登陆
           const {rightPhone,phone,code}=this
           if(!this.rightPhone){
             //手机号不对
             this.showAlert('手机号不正确')
+            return
           }else if(!/^\d{6}$/.test(code)){
             //验证码为6位
             this.showAlert('验证码为6位')
+            return
           }
-        }else {
+          //发送Ajax请求短信登陆
+          result=await reqSmsLogin(phone,code)
+
+        }else { //用户名密码登录
           const {name,pwd,captcha}=this
           if(!this.name){
             //用户名需要指定
             this.showAlert('用户名需要指定')
+            return
           }else if(!this.pwd){
             //密码需要指定
             this.showAlert('密码需要指定')
+            return
           }else if(!this.captcha){
             //验证码需要指定
             this.showAlert('验证码需要指定')
+            return
           }
+          //发送Ajax请求密码登陆
+          result=await reqPwdLogin({name,pwd,captcha})
+
+        }
+        //停止计时
+        if (this.computeTime){
+          this.computeTime=0
+          clearInterval(this.intervalId)
+        }
+        //根据结果处理数据
+        if(result.code===0){
+          const user=result.data
+          //将user保存到state中
+          this.$store.dispatch('recordUser',user)
+          //跳转路由
+          this.$router.replace('/profile')
+        }else {
+          const msg=result.msg
+          this.getCaptcha()
+          this.showAlert(msg)
         }
       },
+      //关闭提示框
       closeTip(){
         this.alertText=''
         this.alertShow=false
-      }
+      },
+
     },
     components :{
       AlertTip

@@ -4,5 +4,9 @@ export default {
   address: {},
   categorys:[],
   shops:[],
+  userInfo:{},//保存用户信息
+  goods:[],
+  ratings:[],
+  info:{},
 }
 
