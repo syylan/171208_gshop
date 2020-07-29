@@ -38,25 +38,25 @@
           <span class="content-tag">
             <span class="mini-tag">品牌</span>
           </span>
-           <span class="content-name">嘉禾一品（温都水城）</span>
+           <span class="content-name">{{info.name}}</span>
          </h2>
          <ul class="brief-modal-msg">
-           <li><h3>3.5</h3>
+           <li><h3>{{info.score}}</h3>
              <p>评分</p>
            </li>
-           <li><h3>90 单</h3>
+           <li><h3>{{info.sellCount}} 单</h3>
              <p>月售</p></li>
-           <li><h3>硅谷专送</h3>
-             <p>约 28 分钟</p></li>
-           <li><h3>4 元</h3>
+           <li><h3>{{info.description}}</h3>
+             <p>约 {{info.deliveryTime}} 分钟</p></li>
+           <li><h3>{{info.deliveryPrice}} 元</h3>
              <p>配送费用</p></li>
-           <li><h3>1000m</h3>
+           <li><h3>{{info.distance}}</h3>
              <p>距离</p></li>
          </ul>
          <h3 class="brief-modal-title">
            <span>公告</span>
          </h3>
-         <div class="brief-modal-notice"> 是以粥为特色的中式营养快餐，自 2004 年 10 月 18 日创立“嘉和一品”品牌至今</div>
+         <div class="brief-modal-notice"> {{info.bulletin}}</div>
          <div class="mask-footer" @click="toggleShopShow"><span class="iconfont icon-icon-close"></span></div>
        </div>
        <div class="brief-modal-cover"></div>
@@ -66,18 +66,12 @@
   <div class="activity-sheet" v-show="supportShow">
   <div class="activity-sheet-content"><h2 class="activity-sheet-title">优惠活动</h2>
     <ul class="list">
-      <li class="activity-item activity-green"><span class="content-tag"> <span class="mini-tag">首单</span> </span>
-        <span class="activity-content">新用户下单立减 17 元(不与其它活动同享)</span></li>
-      <li class="activity-item activity-red"> <span class="content-tag"> <span class="mini-tag">满减</span>
-            </span> <span class="activity-content">满 35 减 19，满 65 减 35</span></li>
-      <li class="activity-item activity-orange"><span class="content-tag"> <span class="mini-tag">特价</span> </span>
-        <span class="activity-content">【立减 19.5 元】欢乐小食餐</span></li>
-      <li class="activity-item activity-green"><span class="content-tag"> <span class="mini-tag">首单</span> </span>
-        <span class="activity-content">新用户下单立减 17 元(不与其它活动同享)</span></li>
-      <li class="activity-item activity-red"><span class="content-tag"> <span class="mini-tag">满减</span> </span>
-        <span class="activity-content">满 35 减 19，满 65 减 35</span></li>
-      <li class="activity-item activity-orange"><span class="content-tag"> <span class="mini-tag">特价</span> </span>
-        <span class="activity-content">【立减 19.5 元】欢乐小食餐</span></li>
+      <li class="activity-item" v-for="(support,index) in info.supports" :key="index" :class="supportClasses[support.type]">
+        <span class="content-tag">
+          <span class="mini-tag">{{support.name}}</span>
+        </span>
+        <span class="activity-content">{{support.content}}</span>
+      </li>
     </ul>
     <div class="activity-sheet-close"><span class="iconfont icon-icon-close" @click="toggleSupportShow"></span></div>
   </div>
