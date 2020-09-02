@@ -6,3 +6,6 @@ export const RESET_USER_INFO='reset_user_info'  //删除用户信息
 export const RECEIVE_GOODS='receive_goods'
 export const RECEIVE_RATINGS='receive_ratings'
 export const RECEIVE_INFO='receive_info'
+export const INCREMENT_FOOD_COUNT='increment_food_count'//增加food中的count
+export const DECREMENT_FOOD_COUNT='decrement_food_count'
+

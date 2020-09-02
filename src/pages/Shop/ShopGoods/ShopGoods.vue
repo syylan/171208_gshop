@@ -1,9 +1,10 @@
 <template>
   <div>
     <div class="goods">
-      <div class="menu-wrapper" ref="menuWrapper">
+      <div class="menu-wrapper" >
         <ul>
-          <li class="menu-item " v-for="(good,index) in goods" :key="index">
+          <li class="menu-item " v-for="(good,index) in goods" :key="index"
+              :class="{current:index===currentIndex}" @click="clickMenuItem(index)">
             <span class="text bottom-border-1px">
             <img class="icon" :src="good.icon" v-if="good.icon">
             {{good.name}}
@@ -11,8 +12,8 @@
           </li>
         </ul>
       </div>
-      <div class="foods-wrapper" ref="foodsWrapper">
-        <ul>
+      <div class="foods-wrapper" >
+        <ul ref="foodsUl">
           <li class="food-list-hook" v-for="(good,index) in goods" :key="index">
             <h1 class="title">{{good.name}}</h1>
             <ul>
@@ -32,7 +33,7 @@
                     <span class="old" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    CartControl
+                      <CartControl :food="food"/>
                   </div>
                 </div>
               </li>
@@ -46,15 +47,85 @@
 </template>
 
 <script>
+  import BScroll from 'better-scroll'
   import {mapState} from 'vuex'
+  import CartControl from '../../../components/CartControl/CartControl'
   export default {
+    data(){
+      return{
+        scrollY:0,//右侧滑动的Y轴坐标
+        tops:[],//所有右侧分类Li的top组成的数组
+      }
+    },
     //1.触发action，从后台获取数据
     mounted () {
-      this.$store.dispatch('getShopGoods')
+      this.$store.dispatch('getShopGoods',()=>{//数据更新后执行
+        this.$nextTick(()=>{ //$nextTick  回调函数在数据更新完成后就会调用
+          this._initScroll()
+          this._initTops()
+        })
+      })
+
     },
     //2.将数据从vuex中读取到组件中
-    computed:{
-      ...mapState(['goods'])
+    computed:{//初始和相关数据发生变化，将会执行计算属性
+      ...mapState(['goods']),
+      //计算得到当前分类的下标
+      currentIndex(){
+        //得到相关的条件数据
+       const {scrollY,tops}=this
+        // debugger
+        //根据条件计算产生结果
+        const index=tops.findIndex((top,index)=>{
+          // console.log('0000',top,scrollY,tops[index+1])
+        return scrollY>=top && scrollY<tops[index+1]
+        })
+        //返回结果
+        return index
+      }
+    },
+    methods:{
+      //初始化滚动条
+      _initScroll(){
+        new BScroll('.menu-wrapper',{
+          // probeType:3,
+          click:true
+        })
+        this.foodsScroll=new BScroll('.foods-wrapper',{
+          probeType:3,
+          click: true
+        })
+        this.foodsScroll.on('scroll',({x,y})=>{
+          // console.log(x,y)
+          this.scrollY=Math.abs(y)
+          // console.log('scrollY',scrollY)
+        })
+      },
+      _initTops() {
+        //1初始化tops
+        const tops=[]
+        let top=0
+        tops.push(top)
+        //2收集
+        //找到所有分类的Li
+        const lis=this.$refs.foodsUl.getElementsByClassName('food-list-hook')
+        Array.prototype.slice.call(lis).forEach(li=>{
+          top+=li.clientHeight
+          tops.push(top)
+        })
+        //3更新数据
+        this.tops=tops
+        console.log(tops)
+      },
+      clickMenuItem(index){
+        console.log(index)
+        const scrollY=this.tops[index]
+        this.scrollY=scrollY
+        this.foodsScroll.scrollTo(0,-scrollY,300)
+      }
+    },
+    components:{
+      CartControl
     }
   }
 </script>
@@ -75,7 +146,7 @@
       background: #f3f5f7
       .menu-item
         display: table
-        height: 54px
+        height: 65px
         width: 56px
         padding: 0 12px
         line-height: 14px
