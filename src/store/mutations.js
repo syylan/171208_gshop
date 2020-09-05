@@ -43,6 +43,7 @@ export default {
       // food.count=1  //第一次没有 默认为1;新增属性（没有数据绑定）
       //1.对象 2.属性名 3.属性值
       Vue.set(food,'count',1)  //这种添加方式 让新增的属性也有数据绑定
+      state.cartFoods.push(food)  //push添加
     }else {
       food.count++
     }
@@ -50,6 +51,9 @@ export default {
   [DECREMENT_FOOD_COUNT](state,{food}){
    if(food.count){
      food.count--
+     if(food.count===0){
+       state.cartFoods.splice(state.cartFoods.indexOf(food),1)  //splice必须有下标（indexOf方法）1 代表删除个数
+     }
    }
   }
 }
