@@ -32,7 +32,7 @@
       line-height: 24px
       font-size: 24px
       color: rgb(0, 160, 220)
-    .icon-remove_circle_outline
+    .icon-iconremoveoutline
       display: inline-block
       padding 6px
       line-height 24px
@@ -52,7 +52,7 @@
       text-align: center
       font-size: 10px
       color: rgb(147, 153, 159)
-    .icon-add_circle
+    .icon-jia
       display: inline-block
       padding: 6px
       line-height: 24px
